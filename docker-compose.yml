@@ -1,8 +1,9 @@
+version: '3.8'
 services:
   bot:
     build:
-      context: ./bot
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: bot/Dockerfile
     container_name: bot
     restart: always
     environment:
@@ -10,13 +11,14 @@ services:
       BOT_TOKEN: "${BOT_TOKEN}"
     ports:
       - "8081:8080"
+    depends_on:
+      - scrapper
 
   scrapper:
     build:
-      context: ./scrapper
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: scrapper/Dockerfile
     container_name: scrapper
     restart: always
     ports:
       - "8082:8080"
-
