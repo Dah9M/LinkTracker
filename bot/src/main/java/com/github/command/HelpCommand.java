@@ -8,7 +8,7 @@ public class HelpCommand implements Command {
 
     private final SendMessageInterface sendMessageService;
 
-    private static final String HELP_MESSAGE = "/start - регистрация пользователя.\n" +
+    static final String HELP_MESSAGE = "/start - регистрация пользователя.\n" +
             "/help - вывод списка доступных команд.\n" +
             "/track - начать отслеживание ссылки.\n" +
             "/untrack - прекратить отслеживание ссылки.\n" +

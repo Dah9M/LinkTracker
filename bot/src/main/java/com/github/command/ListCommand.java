@@ -8,7 +8,7 @@ public class ListCommand implements Command {
 
     private final SendMessageInterface sendMessageService;
 
-    private final static String LIST_MESSAGE = "Список отслеживаемых ссылок: ";
+    final static String LIST_MESSAGE = "Список отслеживаемых ссылок: ";
 
     public ListCommand(SendMessageInterface sendMessageService) {
         this.sendMessageService = sendMessageService;

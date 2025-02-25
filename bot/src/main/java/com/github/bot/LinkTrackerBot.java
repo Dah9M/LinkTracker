@@ -43,7 +43,7 @@ public class LinkTrackerBot extends TelegramLongPollingBot {
         return botToken;
     }
 
-    // TODO: Понять как избавиться от SneakyThrows и почему здесь вообще кидает исключение
+    // TODO: разобраться со @SneakyThrows
     @SneakyThrows
     @Override
     public void onUpdateReceived(Update update) {

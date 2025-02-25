@@ -22,6 +22,7 @@ public class SendMessageService implements SendMessageInterface {
         SendMessage sm = new SendMessage();
         sm.setChatId(chatId);
         sm.setText(message);
+        sm.enableHtml(true);
 
         try {
             bot.execute(sm);

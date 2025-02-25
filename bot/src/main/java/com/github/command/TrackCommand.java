@@ -8,7 +8,7 @@ public class TrackCommand implements Command {
 
     private final SendMessageInterface sendMessageService;
 
-    private static final String TRACK_MESSAGE = "Начал отслеживание этого ресурса.";
+    static final String TRACK_MESSAGE = "Начал отслеживание этого ресурса.";
 
     public TrackCommand(SendMessageInterface sendMessageService) {
         this.sendMessageService = sendMessageService;

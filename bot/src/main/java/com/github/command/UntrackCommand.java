@@ -8,7 +8,7 @@ public class UntrackCommand implements Command {
 
     private final SendMessageInterface sendMessageService;
 
-    private final static String UNTRACK_MESSAGE = "Деактивировал отслеживание этого ресурса.";
+    final static String UNTRACK_MESSAGE = "Деактивировал отслеживание этого ресурса.";
 
     public UntrackCommand(SendMessageInterface sendMessageService) {
         this.sendMessageService = sendMessageService;
