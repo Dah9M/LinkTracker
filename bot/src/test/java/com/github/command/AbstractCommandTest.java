@@ -2,6 +2,7 @@ package com.github.command;
 
 import com.github.bot.LinkTrackerBot;
 import com.github.service.SendMessageService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -9,15 +10,24 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.lang.reflect.Field;
+
 abstract class AbstractCommandTest {
+    // Мок‐бот, на который будет вызываться execute(...)
     protected LinkTrackerBot bot = Mockito.mock(LinkTrackerBot.class);
-    protected SendMessageService sendMessageService = new SendMessageService(bot);
+
+    protected SendMessageService sendMessageService = new SendMessageService();
 
     abstract String getCommandName();
-
     abstract String getCommandMessage();
-
     abstract Command getCommand();
+
+    @BeforeEach
+    void setUpBotInService() throws Exception {
+        Field botField = sendMessageService.getClass().getDeclaredField("bot");
+        botField.setAccessible(true);
+        botField.set(sendMessageService, bot);
+    }
 
     @Test
     public void shouldProperlyExecuteCommand() throws TelegramApiException {

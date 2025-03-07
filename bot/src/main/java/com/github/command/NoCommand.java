@@ -1,22 +1,30 @@
 package com.github.command;
 
-import com.github.service.SendMessageInterface;
+import com.github.service.HelpUnknownService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+@Component
 public class NoCommand implements Command {
 
-    private final SendMessageInterface sendMessageService;
+    private final HelpUnknownService helpUnknownService;
 
-    final static String NO_MESSAGE = "Я поддерживаю команды, начинающиеся со слеша(/).\n"
-            + "Чтобы посмотреть список команд введите /help";
-
-    public NoCommand(SendMessageInterface sendMessageService) {
-        this.sendMessageService = sendMessageService;
+    @Autowired
+    public NoCommand(HelpUnknownService helpUnknownService) {
+        this.helpUnknownService = helpUnknownService;
     }
 
     @Override
     public void execute(Update update) throws TelegramApiException {
-        sendMessageService.sendMessage(update.getMessage().getChatId().toString(), NO_MESSAGE);
+        String chatId = update.getMessage().getChatId().toString();
+
+        helpUnknownService.sendNoText(chatId);
+    }
+
+    @Override
+    public String getCommandName() {
+        return "NO";
     }
 }

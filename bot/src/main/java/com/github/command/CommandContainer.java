@@ -1,29 +1,23 @@
 package com.github.command;
 
-import com.github.service.SendMessageInterface;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import static com.github.command.CommandName.*;
-
+@Component
 public class CommandContainer {
-    private final Map<String, Command> commandMap;
-    private final Command unknownCommand;
+    private final Map<String, Command> commandMap = new HashMap<>();
 
-    public CommandContainer(SendMessageInterface sendMessageService) {
-        commandMap = new HashMap<>();
-        commandMap.put(START.getCommandName(), new StartCommand(sendMessageService));
-        commandMap.put(HELP.getCommandName(), new HelpCommand(sendMessageService));
-        commandMap.put(LIST.getCommandName(), new ListCommand(sendMessageService));
-        commandMap.put(TRACK.getCommandName(), new TrackCommand(sendMessageService));
-        commandMap.put(UNTRACK.getCommandName(), new UntrackCommand(sendMessageService));
-        commandMap.put(NO.getCommandName(), new NoCommand(sendMessageService));
+    public CommandContainer(List<Command> commandList) {
+        for (Command command : commandList) {
+            commandMap.put(command.getCommandName(), command);
+        }
 
-        unknownCommand = new UnknownCommand(sendMessageService);
     }
 
     public Command retrieveCommand(String commandIdentifier) {
-        return commandMap.getOrDefault(commandIdentifier, unknownCommand);
+        return commandMap.getOrDefault(commandIdentifier, commandMap.get("UNKNOWN"));
     }
 }

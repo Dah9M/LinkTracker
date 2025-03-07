@@ -2,28 +2,63 @@ package com.github.config;
 
 
 import com.github.bot.LinkTrackerBot;
-import com.github.command.CommandContainer;
+import com.github.command.*;
+import com.github.repository.SubscriptionRepository;
+import com.github.repository.UserRepository;
+import com.github.service.HelpUnknownService;
 import com.github.service.SendMessageService;
+import com.github.service.SubscriptionService;
+import com.github.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 @Profile("!test")
 public class BotConfig {
 
     @Bean
-    public SendMessageService sendMessageService(TelegramLongPollingBot bot) {
-        return new SendMessageService(bot);
+    public UserService userService(UserRepository userRepository, SendMessageService sendMessageService) {
+        return new UserService(sendMessageService, userRepository);
     }
 
     @Bean
-    public CommandContainer commandContainer(SendMessageService sendMessageService) {
-        return new CommandContainer(sendMessageService);
+    public HelpUnknownService helpUnknownService(SendMessageService sendMessageService) {
+        return new HelpUnknownService(sendMessageService);
+    }
+
+    @Bean
+    public SubscriptionService subscriptionService(SubscriptionRepository subscriptionRepository,
+                                                   SendMessageService sendMessageService) {
+        return new SubscriptionService(subscriptionRepository, sendMessageService);
+    }
+
+    @Bean
+    public CommandContainer commandContainer(List<Command> commandList,
+                                             HelpCommand helpCommand,
+                                             ListCommand listCommand,
+                                             StartCommand startCommand,
+                                             TrackCommand trackCommand,
+                                             UntrackCommand untrackCommand,
+                                             UnknownCommand unknownCommand,
+                                             NoCommand noCommand
+                                             ) {
+
+        List<Command> commands = new ArrayList<>(commandList);
+        commands.add(helpCommand);
+        commands.add(listCommand);
+        commands.add(startCommand);
+        commands.add(trackCommand);
+        commands.add(unknownCommand);
+        commands.add(untrackCommand);
+        commands.add(noCommand);
+        return new CommandContainer(commandList);
     }
 
 

@@ -1,21 +1,26 @@
 package com.github.command;
 
-import com.github.service.SendMessageInterface;
+import com.github.service.UserService;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+@Component
 public class StartCommand implements Command {
 
-    private final SendMessageInterface sendMessageService;
+    private final UserService userService;
 
-    public final static String START_MESSAGE = "Привет. Я LinkTracker Bot. Я помогу тебе быть в курсе последних " +
-            "обновлений тех ресурсов, которые тебе интересны.";
-
-    public StartCommand(SendMessageInterface sendMessageService) {
-        this.sendMessageService = sendMessageService;
+    public StartCommand(UserService userService) {
+        this.userService = userService;
     }
     @Override
     public void execute(Update update) throws TelegramApiException {
-        sendMessageService.sendMessage(update.getMessage().getChatId().toString(), START_MESSAGE);
+        String chatId = update.getMessage().getChatId().toString();
+        userService.addUser(chatId);
+    }
+
+    @Override
+    public String getCommandName() {
+        return "/start";
     }
 }
