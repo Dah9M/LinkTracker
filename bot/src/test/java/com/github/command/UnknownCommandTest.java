@@ -1,24 +1,47 @@
 package com.github.command;
 
+import com.github.service.HelpUnknownService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import static com.github.command.UnknownCommand.UNKNOWN_MESSAGE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
 @DisplayName("Unit test for UnknownCommand")
-public class UnknownCommandTest extends AbstractCommandTest {
+public class UnknownCommandTest {
 
-    @Override
-    String getCommandName() {
-        return "/jopa";
+    private HelpUnknownService helpUnknownService;
+    private UnknownCommand unknownCommand;
+
+    @BeforeEach
+    public void init() {
+        helpUnknownService = Mockito.mock(HelpUnknownService.class);
+        unknownCommand = new UnknownCommand(helpUnknownService);
     }
 
-    @Override
-    String getCommandMessage() {
-        return UNKNOWN_MESSAGE;
+    @Test
+    public void shouldProperlyExecuteCommand() throws TelegramApiException {
+        Update update = mock(Update.class);
+        Message message = mock(Message.class);
+
+        String chatId = "12345";
+
+        when(update.getMessage()).thenReturn(message);
+        when(message.getChatId()).thenReturn(12345L);
+
+        unknownCommand.execute(update);
+
+        verify(helpUnknownService).sendUnknownText(chatId);
+        verifyNoMoreInteractions(helpUnknownService);
     }
 
-    @Override
-    Command getCommand() {
-        return new UnknownCommand(sendMessageService);
+    @Test
+    public void shouldReturnCorrectCommandName() {
+        assertEquals("UNKNOWN", unknownCommand.getCommandName());
     }
 }

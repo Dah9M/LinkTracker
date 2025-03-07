@@ -1,22 +1,29 @@
 package com.github.command;
 
 import com.github.service.SendMessageInterface;
+import com.github.service.SubscriptionServiceInterface;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+@Component
 public class ListCommand implements Command {
 
-    private final SendMessageInterface sendMessageService;
+    private final SubscriptionServiceInterface subscriptionService;
 
-    final static String LIST_MESSAGE = "Список отслеживаемых ссылок: ";
-
-    public ListCommand(SendMessageInterface sendMessageService) {
-        this.sendMessageService = sendMessageService;
+    public ListCommand(SubscriptionServiceInterface subscriptionService) {
+        this.subscriptionService = subscriptionService;
     }
 
     @Override
     public void execute(Update update) throws TelegramApiException {
-        sendMessageService.sendMessage(update.getMessage().getChatId().toString(), LIST_MESSAGE);
+        String chatId = update.getMessage().getChatId().toString();
+
+        subscriptionService.getSubscriptions(chatId);
     }
 
+    @Override
+    public String getCommandName() {
+        return "/list";
+    }
 }

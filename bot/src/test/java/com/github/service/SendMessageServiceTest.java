@@ -1,40 +1,48 @@
 package com.github.service;
 
-import com.github.bot.LinkTrackerBot;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import java.lang.reflect.Field;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
 
 @DisplayName("Unit test for SendMessageService")
 public class SendMessageServiceTest {
 
-    private SendMessageService sendBotMessageService;
-    private LinkTrackerBot bot;
+    private SendMessageService sendMessageService;
+    private TelegramLongPollingBot botMock;
 
     @BeforeEach
-    public void init() {
-        bot = Mockito.mock(LinkTrackerBot.class);
-        sendBotMessageService = new SendMessageService(bot);
+    void setUp() throws Exception {
+        sendMessageService = new SendMessageService();
+
+        botMock = Mockito.mock(TelegramLongPollingBot.class);
+
+        Field botField = sendMessageService.getClass().getDeclaredField("bot");
+        botField.setAccessible(true);
+        botField.set(sendMessageService, botMock);
     }
 
     @Test
-    public void shouldProperlySendMessage() throws TelegramApiException {
-        //given
-        Long chatId = 123L;
-        String message = "test_message";
+    void shouldProperlySendMessage() throws TelegramApiException {
+        String chatId = "12345";
+        String message = "Hello from test";
 
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setText(message);
-        sendMessage.setChatId(chatId.toString());
-        sendMessage.enableHtml(true);
+        sendMessageService.sendMessage(chatId, message);
 
-        //when
-        sendBotMessageService.sendMessage(chatId.toString(), message);
+        ArgumentCaptor<SendMessage> captor = ArgumentCaptor.forClass(SendMessage.class);
+        verify(botMock).execute(captor.capture());
 
-        //then
-        Mockito.verify(bot).execute(sendMessage);
+        SendMessage actualMsg = captor.getValue();
+        assertEquals(chatId, actualMsg.getChatId());
+        assertEquals(message, actualMsg.getText());
     }
 }

@@ -1,22 +1,33 @@
 package com.github.command;
 
 import com.github.service.SendMessageInterface;
+import com.github.service.SubscriptionServiceInterface;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+
+@Component
 public class TrackCommand implements Command {
 
-    private final SendMessageInterface sendMessageService;
+    private final SubscriptionServiceInterface subscriptionService;
 
-    static final String TRACK_MESSAGE = "Начал отслеживание этого ресурса.";
 
-    public TrackCommand(SendMessageInterface sendMessageService) {
-        this.sendMessageService = sendMessageService;
+    public TrackCommand(SubscriptionServiceInterface subscriptionService) {
+        this.subscriptionService = subscriptionService;
     }
 
 
     @Override
     public void execute(Update update) throws TelegramApiException {
-        sendMessageService.sendMessage(update.getMessage().getChatId().toString(), TRACK_MESSAGE);
+        String chatId = update.getMessage().getChatId().toString();
+        String message = update.getMessage().getText().trim();
+
+        subscriptionService.addSubscription(chatId, message.split(" "));
+    }
+
+    @Override
+    public String getCommandName() {
+        return "/track";
     }
 }

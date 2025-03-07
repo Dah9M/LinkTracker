@@ -1,19 +1,13 @@
 package com.github.bot;
 
 import com.github.command.CommandContainer;
-import com.github.service.SendMessageInterface;
-import com.github.service.SendMessageService;
-import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-
-import static com.github.command.CommandName.NO;
 
 @Slf4j
 @Component
@@ -29,8 +23,8 @@ public class LinkTrackerBot extends TelegramLongPollingBot {
 
     private final CommandContainer commandContainer;
 
-    public LinkTrackerBot() {
-        this.commandContainer = new CommandContainer(new SendMessageService(this));
+    public LinkTrackerBot(@Autowired CommandContainer commandContainer) {
+        this.commandContainer = commandContainer;
     }
 
     @Override
@@ -57,7 +51,7 @@ public class LinkTrackerBot extends TelegramLongPollingBot {
 
                 commandContainer.retrieveCommand(commandIdentifier).execute(update);
             } else {
-                commandContainer.retrieveCommand(NO.getCommandName()).execute(update);
+                commandContainer.retrieveCommand("NO").execute(update);
             }
 
         }
