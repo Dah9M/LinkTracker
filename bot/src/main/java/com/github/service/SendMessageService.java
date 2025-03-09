@@ -2,10 +2,9 @@ package com.github.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.List;
@@ -14,11 +13,12 @@ import java.util.List;
 @Service
 public class SendMessageService implements SendMessageInterface {
 
-    @Lazy
-    @Autowired
-    private TelegramLongPollingBot bot;
+    private final AbsSender sender;
 
-    public SendMessageService() {}
+    @Autowired
+    public SendMessageService(AbsSender sender) {
+        this.sender = sender;
+    }
 
     @Override
     public void sendMessage(String chatId, String message) {
@@ -28,7 +28,7 @@ public class SendMessageService implements SendMessageInterface {
         sm.enableHtml(true);
 
         try {
-            bot.execute(sm);
+            sender.execute(sm);
         } catch (TelegramApiException e) {
             log.error("Failed to send message {} via Telegram API.", message);
             e.printStackTrace();

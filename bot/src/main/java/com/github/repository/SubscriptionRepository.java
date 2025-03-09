@@ -1,5 +1,7 @@
 package com.github.repository;
 
+import com.github.exception.SubscriptionErrorType;
+import com.github.exception.SubscriptionException;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -11,41 +13,43 @@ import java.util.Map;
 public class SubscriptionRepository {
     private final Map<String, List<String>> subscriptionMap = new HashMap<>();
 
+    public void addSubscriptionToDatabase(String chatId, String url) {
+        List<String> userSubs = subscriptionMap.get(chatId);
+
+        if (userSubs == null) {
+            userSubs = new ArrayList<>();
+            subscriptionMap.put(chatId, userSubs);
+        }
+
+        if (userSubs.contains(url)) {
+            throw new SubscriptionException(
+                    SubscriptionErrorType.DUPLICATE,
+                    "Пользователь уже подписан на данный ресурс"
+            );
+        }
+        userSubs.add(url);
+    }
+
+    public void deleteSubscriptionFromDatabase(String chatId, String url) {
+        List<String> userSubs = subscriptionMap.get(chatId);
+
+        if (userSubs == null) {
+            throw new SubscriptionException(
+                    SubscriptionErrorType.NO_SUBS,
+                    "У пользователя нет подписок"
+            );
+        }
+
+        boolean removed = userSubs.remove(url);
+        if (!removed) {
+            throw new SubscriptionException(
+                    SubscriptionErrorType.NO_URL,
+                    "Нет такой подписки у пользователя"
+            );
+        }
+    }
+
     public List<String> getSubscriptionsById(String chatId) {
         return subscriptionMap.get(chatId);
-    }
-
-    public String addSubscriptionToDatabase(String chatId, String url) {
-        List<String> userSubs = subscriptionMap.get(chatId);
-
-        if (userSubs != null) {
-            if (userSubs.contains(url)) {
-                return "DUPLICATE";
-            }
-
-            userSubs.add(url);
-            subscriptionMap.put(chatId, userSubs);
-            return "OK";
-        }
-
-        List<String> newUser = new ArrayList<>();
-        newUser.add(url);
-        subscriptionMap.put(chatId, newUser);
-        return "OK";
-    }
-
-    public String deleteSubscriptionFromDatabase(String chatId, String url) {
-        List<String> userSubs = subscriptionMap.get(chatId);
-
-        if (userSubs != null) {
-            if (userSubs.contains(url)) {
-                userSubs.remove(url);
-                return "OK";
-            } else {
-                return "NO_URL";
-            }
-        } else {
-            return "NO_SUBS";
-        }
     }
 }

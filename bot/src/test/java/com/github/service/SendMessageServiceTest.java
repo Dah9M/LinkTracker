@@ -1,5 +1,6 @@
 package com.github.service;
 
+import com.github.TelegramSender;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,10 +20,12 @@ public class SendMessageServiceTest {
 
     private SendMessageService sendMessageService;
     private TelegramLongPollingBot botMock;
+    private TelegramSender telegramSender;
 
     @BeforeEach
     void setUp() throws Exception {
-        sendMessageService = new SendMessageService();
+        telegramSender = Mockito.mock(TelegramSender.class);
+        sendMessageService = new SendMessageService(telegramSender);
 
         botMock = Mockito.mock(TelegramLongPollingBot.class);
 
