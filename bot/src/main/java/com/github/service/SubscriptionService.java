@@ -1,5 +1,10 @@
 package com.github.service;
 
+import com.github.UrlValidator;
+import com.github.exception.SubscriptionErrorType;
+import com.github.exception.SubscriptionException;
+import com.github.exception.UrlValidationErrorType;
+import com.github.exception.UrlValidationException;
 import com.github.repository.SubscriptionRepository;
 import org.jvnet.hk2.annotations.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +12,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.List;
 
-import static com.github.UrlValidator.isValidUrl;
 import static com.github.service.MessageName.*;
 
 @Service
@@ -16,87 +20,79 @@ public class SubscriptionService implements SubscriptionServiceInterface {
     private final SubscriptionRepository subscriptionRepository;
 
     @Autowired
-    public SubscriptionService(SubscriptionRepository subscriptionRepository, SendMessageInterface sendMessageService) {
+    public SubscriptionService(SubscriptionRepository subscriptionRepository,
+                               SendMessageInterface sendMessageService) {
         this.subscriptionRepository = subscriptionRepository;
         this.sendMessageService = sendMessageService;
     }
 
     @Override
     public void addSubscription(String chatId, String[] message) throws TelegramApiException {
-        String urlStatus = isValidUrl(message);
-        String url;
+        try {
+            String url = UrlValidator.getUrlOrThrow(message);
 
-        switch (urlStatus) {
-            case "NO_URL":
-                sendMessageService.sendMessage(chatId, NO_URL_MESSAGE.getMessageName());
-                return;
-            case "NO_VALID":
-                sendMessageService.sendMessage(chatId, NO_VALID_URL.getMessageName());
-                return;
-            default:
-                url = message[1];
-        }
+            subscriptionRepository.addSubscriptionToDatabase(chatId, url);
 
-        String addStatus = subscriptionRepository.addSubscriptionToDatabase(chatId, url);
-
-        if (addStatus.equals("OK")) {
             sendMessageService.sendMessage(chatId, TRACK_MESSAGE.getMessageName());
-        } else {
-            sendMessageService.sendMessage(chatId, DUPLICATE_MESSAGE.getMessageName());
+
+        } catch (UrlValidationException e) {
+            switch (e.getErrorType()) {
+                case NO_URL -> sendMessageService.sendMessage(chatId, NO_URL_MESSAGE.getMessageName());
+                case INVALID_URL -> sendMessageService.sendMessage(chatId, NO_VALID_URL.getMessageName());
+            }
+        } catch (SubscriptionException e) {
+            switch (e.getErrorType()) {
+                case DUPLICATE ->
+                        sendMessageService.sendMessage(chatId, DUPLICATE_MESSAGE.getMessageName());
+
+                case NO_URL ->
+                        sendMessageService.sendMessage(chatId, NO_VALID_URL.getMessageName());
+
+                case NO_SUBS ->
+                        sendMessageService.sendMessage(chatId, NO_SUBS_MESSAGE.getMessageName());
+            }
         }
     }
 
     @Override
     public void deleteSubscription(String chatId, String[] message) throws TelegramApiException {
-        String urlStatus = isValidUrl(message);
-        String url;
+        try {
+            String url = UrlValidator.getUrlOrThrow(message);
 
-        switch (urlStatus) {
-            case "NO_URL":
-                sendMessageService.sendMessage(chatId, NO_URL_MESSAGE.getMessageName());
-                return;
-            case "NO_VALID":
-                sendMessageService.sendMessage(chatId, NO_VALID_URL.getMessageName());
-                return;
-            default:
-                url = message[1];
-        }
+            subscriptionRepository.deleteSubscriptionFromDatabase(chatId, url);
 
-        String deleteStatus = subscriptionRepository.deleteSubscriptionFromDatabase(chatId, url);
+            sendMessageService.sendMessage(chatId, UNTRACK_MESSAGE.getMessageName());
 
-        switch (deleteStatus) {
-            case "NO_SUBS":
-                sendMessageService.sendMessage(chatId, NO_SUBS_MESSAGE.getMessageName());
-                return;
-            case "NO_URL":
-                sendMessageService.sendMessage(chatId, NO_SUCH_URL.getMessageName());
-                return;
-            default:
-                sendMessageService.sendMessage(chatId, UNTRACK_MESSAGE.getMessageName());
+        } catch (UrlValidationException e) {
+            switch (e.getErrorType()) {
+                case NO_URL -> sendMessageService.sendMessage(chatId, NO_URL_MESSAGE.getMessageName());
+                case INVALID_URL -> sendMessageService.sendMessage(chatId, NO_VALID_URL.getMessageName());
+            }
+
+        } catch (SubscriptionException e) {
+            switch (e.getErrorType()) {
+                case NO_SUBS -> sendMessageService.sendMessage(chatId, NO_SUBS_MESSAGE.getMessageName());
+
+                case NO_URL -> sendMessageService.sendMessage(chatId, NO_SUCH_URL.getMessageName());
+
+                case DUPLICATE -> sendMessageService.sendMessage(chatId, "Неожиданная ошибка удаления");
+            }
         }
     }
 
     @Override
     public void getSubscriptions(String chatId) throws TelegramApiException {
         List<String> userSubs = subscriptionRepository.getSubscriptionsById(chatId);
-        StringBuilder stringBuilder = new StringBuilder();
-
-        if (userSubs == null) {
+        if (userSubs == null || userSubs.isEmpty()) {
             sendMessageService.sendMessage(chatId, NO_SUBS_MESSAGE.getMessageName());
             return;
         }
 
-        stringBuilder.append("1. ");
-        stringBuilder.append(userSubs.getFirst());
-        stringBuilder.append("\n");
-
-        for (int index = 1; index < userSubs.size(); index++) {
-            stringBuilder.append(index + 1);
-            stringBuilder.append(". ");
-            stringBuilder.append(userSubs.get(index));
-            stringBuilder.append("\n");
+        StringBuilder sb = new StringBuilder();
+        for (int index = 0; index < userSubs.size(); index++) {
+            sb.append(index + 1).append(". ").append(userSubs.get(index)).append("\n");
         }
 
-        sendMessageService.sendMessage(chatId, stringBuilder.toString());
+        sendMessageService.sendMessage(chatId, sb.toString());
     }
 }

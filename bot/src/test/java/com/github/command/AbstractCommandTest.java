@@ -1,5 +1,6 @@
 package com.github.command;
 
+import com.github.TelegramSender;
 import com.github.bot.LinkTrackerBot;
 import com.github.service.SendMessageService;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,8 +16,8 @@ import java.lang.reflect.Field;
 abstract class AbstractCommandTest {
     // Мок‐бот, на который будет вызываться execute(...)
     protected LinkTrackerBot bot = Mockito.mock(LinkTrackerBot.class);
-
-    protected SendMessageService sendMessageService = new SendMessageService();
+    protected TelegramSender telegramSender = Mockito.mock(TelegramSender.class);
+    protected SendMessageService sendMessageService = new SendMessageService(telegramSender);
 
     abstract String getCommandName();
     abstract String getCommandMessage();

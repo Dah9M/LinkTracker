@@ -1,6 +1,7 @@
 package com.github.config;
 
 
+import com.github.TelegramSender;
 import com.github.bot.LinkTrackerBot;
 import com.github.command.*;
 import com.github.repository.SubscriptionRepository;
@@ -12,6 +13,7 @@ import com.github.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
@@ -22,6 +24,22 @@ import java.util.List;
 @Configuration
 @Profile("!test")
 public class BotConfig {
+
+    @Bean
+    public DefaultBotOptions defaultBotOptions() {
+        DefaultBotOptions options = new DefaultBotOptions();
+
+        return options;
+    }
+    @Bean
+    public SendMessageService sendMessageService(TelegramSender telegramSender) {
+        return new SendMessageService(telegramSender);
+    }
+
+    @Bean
+    public TelegramSender telegramSender(DefaultBotOptions options) {
+        return new TelegramSender(options);
+    }
 
     @Bean
     public UserService userService(UserRepository userRepository, SendMessageService sendMessageService) {
