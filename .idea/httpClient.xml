@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="HttpClientEndpointsTabState">
+    <option name="requestToText" value="&lt;CachedHttpClientTabRequests&gt;&#10;  &lt;entry key=&quot;0559e32e7a23f3578efb0d98d9cc1da5b5b38755&quot; value=&quot;###&amp;#10;POST http://localhost:8081/links&amp;#10;Content-Type: application/json&amp;#10;&amp;#10;{&amp;#10;  &amp;quot;link&amp;quot;: &amp;quot;&amp;quot;&amp;#10;}&quot; /&gt;&#10;  &lt;entry key=&quot;dd9c4cf6db4915b37f91162d19899dd1d7b16a10&quot; value=&quot;###&amp;#10;DELETE http://localhost:8080/tgchat/{{id}}/{{id}}&quot; /&gt;&#10;  &lt;entry key=&quot;15ca8cd1767e8c4c96e7302c01594d7a501e63b8&quot; value=&quot;###&amp;#10;POST http://localhost:8080/tgchat/{id}/{id}&quot; /&gt;&#10;  &lt;entry key=&quot;3a6ef4ffb208a2d97d32d1812212aa4cf3b5b114&quot; value=&quot;###&amp;#10;DELETE http://localhost:8080/link&quot; /&gt;&#10;&lt;/CachedHttpClientTabRequests&gt;" />
+  </component>
+</project>

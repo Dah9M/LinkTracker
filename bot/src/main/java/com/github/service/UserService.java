@@ -1,7 +1,7 @@
 package com.github.service;
 
 
-import com.github.repository.UserRepository;
+import com.github.repository.ChatUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -12,10 +12,10 @@ import static com.github.service.MessageName.*;
 public class UserService {
 
     private final SendMessageInterface sendMessageService;
-    private final UserRepository userRepository;
+    private final ChatUserRepository userRepository;
 
     @Autowired
-    public UserService(SendMessageInterface sendMessageService, UserRepository userRepository) {
+    public UserService(SendMessageInterface sendMessageService, ChatUserRepository userRepository) {
         this.sendMessageService = sendMessageService;
         this.userRepository = userRepository;
     }
@@ -23,12 +23,7 @@ public class UserService {
     public void addUser(String chatId) throws TelegramApiException {
         sendMessageService.sendMessage(chatId, START_MESSAGE.getMessageName());
 
-        String userStatus = userRepository.addUser(chatId);
-
-        if (userStatus.equals("ALREADY_EXIST")) {
-            sendMessageService.sendMessage(chatId, ALREADY_EXIST.getMessageName());
-            return;
-        }
+        Long userStatus = userRepository.createUser(chatId);
 
         sendMessageService.sendMessage(chatId, ADD_USER.getMessageName());
     }

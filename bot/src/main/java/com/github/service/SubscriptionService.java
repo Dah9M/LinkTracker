@@ -1,9 +1,7 @@
 package com.github.service;
 
 import com.github.UrlValidator;
-import com.github.exception.SubscriptionErrorType;
 import com.github.exception.SubscriptionException;
-import com.github.exception.UrlValidationErrorType;
 import com.github.exception.UrlValidationException;
 import com.github.repository.SubscriptionRepository;
 import org.jvnet.hk2.annotations.Service;
@@ -31,7 +29,7 @@ public class SubscriptionService implements SubscriptionServiceInterface {
         try {
             String url = UrlValidator.getUrlOrThrow(message);
 
-            subscriptionRepository.addSubscriptionToDatabase(chatId, url);
+            subscriptionRepository.addSubscription(chatId, url);
 
             sendMessageService.sendMessage(chatId, TRACK_MESSAGE.getMessageName());
 
@@ -59,7 +57,7 @@ public class SubscriptionService implements SubscriptionServiceInterface {
         try {
             String url = UrlValidator.getUrlOrThrow(message);
 
-            subscriptionRepository.deleteSubscriptionFromDatabase(chatId, url);
+            subscriptionRepository.deleteSubscription(chatId, url);
 
             sendMessageService.sendMessage(chatId, UNTRACK_MESSAGE.getMessageName());
 
@@ -74,8 +72,6 @@ public class SubscriptionService implements SubscriptionServiceInterface {
                 case NO_SUBS -> sendMessageService.sendMessage(chatId, NO_SUBS_MESSAGE.getMessageName());
 
                 case NO_URL -> sendMessageService.sendMessage(chatId, NO_SUCH_URL.getMessageName());
-
-                case DUPLICATE -> sendMessageService.sendMessage(chatId, "Неожиданная ошибка удаления");
             }
         }
     }
