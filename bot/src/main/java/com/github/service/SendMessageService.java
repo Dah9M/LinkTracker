@@ -30,7 +30,7 @@ public class SendMessageService implements SendMessageInterface {
         try {
             sender.execute(sm);
         } catch (TelegramApiException e) {
-            log.error("Failed to send message {} via Telegram API.", message);
+            //log.error("Failed to send message {} via Telegram API.", message);
             e.printStackTrace();
         }
     }

@@ -1,55 +1,87 @@
 package com.github.repository;
 
-import com.github.exception.SubscriptionErrorType;
-import com.github.exception.SubscriptionException;
+import com.github.entity.ChatUserEntity;
+import com.github.entity.LinkEntity;
+import com.github.entity.SubscriptionEntity;
+import com.github.entity.SubscriptionId;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 @Repository
 public class SubscriptionRepository {
-    private final Map<String, List<String>> subscriptionMap = new HashMap<>();
 
-    public void addSubscriptionToDatabase(String chatId, String url) {
-        List<String> userSubs = subscriptionMap.get(chatId);
+    private final SubscriptionSpringDataRepository subscriptionJpa;
+    private final ChatUserSpringDataRepository chatUserJpa;
+    private final LinkSpringDataRepository linkJpa;
 
-        if (userSubs == null) {
-            userSubs = new ArrayList<>();
-            subscriptionMap.put(chatId, userSubs);
-        }
-
-        if (userSubs.contains(url)) {
-            throw new SubscriptionException(
-                    SubscriptionErrorType.DUPLICATE,
-                    "Пользователь уже подписан на данный ресурс"
-            );
-        }
-        userSubs.add(url);
+    @Autowired
+    public SubscriptionRepository(SubscriptionSpringDataRepository subscriptionJpa,
+                                  ChatUserSpringDataRepository chatUserJpa,
+                                  LinkSpringDataRepository linkJpa) {
+        this.subscriptionJpa = subscriptionJpa;
+        this.chatUserJpa = chatUserJpa;
+        this.linkJpa = linkJpa;
     }
 
-    public void deleteSubscriptionFromDatabase(String chatId, String url) {
-        List<String> userSubs = subscriptionMap.get(chatId);
-
-        if (userSubs == null) {
-            throw new SubscriptionException(
-                    SubscriptionErrorType.NO_SUBS,
-                    "У пользователя нет подписок"
-            );
+    public void addSubscription(String chatId, String url) {
+        ChatUserEntity user = chatUserJpa.findByChatId(chatId);
+        if (user == null) {
+            throw new RuntimeException("Пользователь с chatId=" + chatId + " не найден");
         }
 
-        boolean removed = userSubs.remove(url);
-        if (!removed) {
-            throw new SubscriptionException(
-                    SubscriptionErrorType.NO_URL,
-                    "Нет такой подписки у пользователя"
-            );
+        LinkEntity link = linkJpa.findByUrl(url);
+        if (link == null) {
+            throw new RuntimeException("Ссылка " + url + " не найдена в таблице link");
         }
+
+        SubscriptionId subId = new SubscriptionId(user.getId(), link.getId());
+        if (subscriptionJpa.existsById(subId)) {
+            throw new RuntimeException("Пользователь уже подписан на данный ресурс");
+        }
+
+        SubscriptionEntity entity = new SubscriptionEntity();
+        entity.setId(subId);
+        entity.setUser(user);
+        entity.setLink(link);
+        entity.setCreatedAt(LocalDateTime.now());
+
+        subscriptionJpa.save(entity);
+    }
+
+    public void deleteSubscription(String chatId, String url) {
+        ChatUserEntity user = chatUserJpa.findByChatId(chatId);
+        if (user == null) {
+            throw new RuntimeException("Пользователь не найден");
+        }
+
+        LinkEntity link = linkJpa.findByUrl(url);
+        if (link == null) {
+            throw new RuntimeException("Ссылка не найдена");
+        }
+
+        SubscriptionId subId = new SubscriptionId(user.getId(), link.getId());
+        if (!subscriptionJpa.existsById(subId)) {
+            throw new RuntimeException("Нет такой подписки у пользователя");
+        }
+
+        subscriptionJpa.deleteById(subId);
     }
 
     public List<String> getSubscriptionsById(String chatId) {
-        return subscriptionMap.get(chatId);
+        ChatUserEntity user = chatUserJpa.findByChatId(chatId);
+        if (user == null) {
+            return List.of();
+        }
+
+        List<SubscriptionEntity> all = subscriptionJpa.findAll();
+        return all.stream()
+                .filter(s -> s.getUser().getId().equals(user.getId()))
+                .map(s -> s.getLink().getUrl())
+                .collect(Collectors.toList());
     }
 }
+

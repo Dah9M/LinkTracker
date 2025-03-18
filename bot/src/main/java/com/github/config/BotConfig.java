@@ -4,8 +4,8 @@ package com.github.config;
 import com.github.TelegramSender;
 import com.github.bot.LinkTrackerBot;
 import com.github.command.*;
+import com.github.repository.ChatUserRepository;
 import com.github.repository.SubscriptionRepository;
-import com.github.repository.UserRepository;
 import com.github.service.HelpUnknownService;
 import com.github.service.SendMessageService;
 import com.github.service.SubscriptionService;
@@ -13,6 +13,7 @@ import com.github.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -42,7 +43,7 @@ public class BotConfig {
     }
 
     @Bean
-    public UserService userService(UserRepository userRepository, SendMessageService sendMessageService) {
+    public UserService userService(ChatUserRepository userRepository, SendMessageService sendMessageService) {
         return new UserService(sendMessageService, userRepository);
     }
 
