@@ -1,8 +1,9 @@
 package com.github.command;
 
-import com.github.TelegramSender;
-import com.github.bot.LinkTrackerBot;
-import com.github.service.SendMessageService;
+import core.TelegramSender;
+import bot.LinkTrackerBot;
+import service.SendMessageService;
+import command.Command;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

@@ -12,6 +12,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.github</groupId>
+			<artifactId>domain</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
 			<groupId>org.telegram</groupId>
 			<artifactId>telegrambots-spring-boot-starter</artifactId>
 			<version>6.9.0</version>
@@ -74,17 +79,6 @@
 			<resource>
 				<directory>src/main/resources</directory>
 				<filtering>false</filtering>
-			</resource>
-			<!-- Копирование миграций из корневой папки -->
-			<resource>
-				<!-- Путь относительно текущего модуля; предполагается, что корневая папка находится на уровень выше -->
-				<directory>${project.basedir}/../migrations</directory>
-				<includes>
-					<include>**/*</include>
-				</includes>
-				<filtering>false</filtering>
-				<!-- Скопировать файлы в папку "changelog" внутри classpath -->
-				<targetPath>changelog</targetPath>
 			</resource>
 		</resources>
 		<plugins>

@@ -17,7 +17,8 @@
 	<modules>
 		<module>bot</module>
 		<module>scrapper</module>
-	</modules>
+        <module>domain</module>
+    </modules>
 
 	<properties>
 		<java.version>23</java.version>
