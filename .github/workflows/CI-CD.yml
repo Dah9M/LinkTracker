@@ -58,6 +58,6 @@ jobs:
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.REMOTE_KEY }}
           script: |
-            cd /app
+            cd app
             docker-compose pull
             docker-compose up -d
