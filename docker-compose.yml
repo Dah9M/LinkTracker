@@ -1,23 +1,23 @@
 version: '3.8'
 services:
   bot:
-    build:
-      context: .
-      dockerfile: bot/Dockerfile
+    image: "${DOCKER_USERNAME}/linktracker_bot:latest"
     container_name: bot
     restart: always
     environment:
       BOT_NAME: "${BOT_NAME}"
       BOT_TOKEN: "${BOT_TOKEN}"
+      SPRING_DATASOURCE_URL: "${DATABASE_URL}"
+      SPRING_DATASOURCE_USERNAME: "${DATABASE_USER}"
+      SPRING_DATASOURCE_PASSWORD: "${DATABASE_PASSWORD}"
+      SPRING_DATASOURCE_DRIVER-CLASS-NAME: "${DATABASE_DRIVER}"
     ports:
       - "8081:8080"
     depends_on:
       - scrapper
 
   scrapper:
-    build:
-      context: .
-      dockerfile: scrapper/Dockerfile
+    image: "${DOCKER_USERNAME}/linktracker_scrapper:latest"
     container_name: scrapper
     restart: always
     ports:

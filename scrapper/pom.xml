@@ -12,6 +12,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.github</groupId>
+            <artifactId>domain</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
@@ -66,17 +71,6 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>false</filtering>
-            </resource>
-            <!-- Копирование миграций из корневой папки -->
-            <resource>
-                <!-- Путь относительно текущего модуля; предполагается, что корневая папка находится на уровень выше -->
-                <directory>${project.basedir}/../migrations</directory>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-                <filtering>false</filtering>
-                <!-- Скопировать файлы в папку "changelog" внутри classpath -->
-                <targetPath>changelog</targetPath>
             </resource>
         </resources>
         <plugins>

@@ -1,0 +1,9 @@
+model/entity/AppUser.class
+model/ResourceType.class
+repository/LinkRepository.class
+model/SubscriptionNotification.class
+model/SubscriptionId.class
+repository/SubscriptionRepository.class
+repository/AppUserRepository.class
+model/entity/Subscription.class
+model/entity/Link.class
