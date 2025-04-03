@@ -42,7 +42,7 @@ public class UpdateCheckerService {
         this.notificationService = notificationService;
     }
 
-    @Scheduled(fixedDelay = 60000)
+    @Scheduled(fixedDelay = 600000)
     public void checkUpdates() {
         log.info("Запуск проверки обновлений...");
 
