@@ -67,7 +67,7 @@ public class UpdateCheckerService {
 
                         List<String> chatIds = subs.stream()
                                 .map(sub -> sub.getUser().getChatId())
-                                .collect(Collectors.toList());
+                                .toList();
 
                         SubscriptionNotification notification = new SubscriptionNotification(link.getUrl(), newUpdate, chatIds);
                         notificationService.sendNotification(notification);
