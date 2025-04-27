@@ -42,17 +42,19 @@ public class LinkTrackerBot extends TelegramLongPollingBot {
         if (update.hasMessage() && update.getMessage().hasText()) {
             String message = update.getMessage().getText().trim();
 
-            log.info("Received message: {}", message);
+            log.info("Получено сообщение: {}", message);
 
             try {
                 if (message.startsWith(COMMAND_PREFIX)) {
                     String commandIdentifier = message.split(" ")[0].toLowerCase();
+                    log.info("Обнаружена команда: {}", commandIdentifier);
                     commandContainer.retrieveCommand(commandIdentifier).execute(update);
                 } else {
+                    log.info("Получено обычное сообщение, передача на команду 'NO'.");
                     commandContainer.retrieveCommand("NO").execute(update);
                 }
             } catch (TelegramApiException e) {
-                e.printStackTrace();
+                log.error("Ошибка при выполнении команды: {}", e.getMessage(), e);
             }
 
         }
