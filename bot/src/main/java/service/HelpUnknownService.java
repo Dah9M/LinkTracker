@@ -26,6 +26,8 @@ public class HelpUnknownService {
     public void sendUnknownText(String chatId) throws TelegramApiException {
         log.info("Отправка ответа на неизвестную команду пользователю с chatId = {}", chatId);
         sendMessageService.sendMessage(chatId, UNTRACK_MESSAGE.getMessageName());
+        sendMessageService.sendMessage(chatId, UNKNOWN_MESSAGE.getMessageName());
+
     }
 
     public void sendHelpText(String chatId) throws TelegramApiException {
