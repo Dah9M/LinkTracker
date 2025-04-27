@@ -1,8 +1,7 @@
 package client;
 
-import config.GithubProperties;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -15,15 +14,15 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class GithubClient extends BaseApiClient {
 
-    private final GithubProperties githubProperties;
+    @Value("${github.token:}")
+    private String githubToken;
 
     private HttpEntity<Void> buildRequestEntity() {
         HttpHeaders headers = new HttpHeaders();
-        if (githubProperties.getToken() != null && !githubProperties.getToken().isEmpty()) {
-            headers.set("Authorization", "token " + githubProperties.getToken());
+        if (githubToken != null && !githubToken.isEmpty()) {
+            headers.set("Authorization", "token " + githubToken);
         }
         return new HttpEntity<>(headers);
     }
