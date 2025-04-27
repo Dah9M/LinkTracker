@@ -47,9 +47,11 @@ public class UpdateCheckerService {
         log.info("Запуск проверки обновлений...");
 
         List<Subscription> subscriptions = subscriptionRepository.findAll();
+        log.info("Всего подписок: {}", subscriptions.size());
 
         Map<Link, List<Subscription>> subscriptionsByLink = subscriptions.stream()
                 .collect(Collectors.groupingBy(Subscription::getLink));
+        log.info("Всего уникальных ссылок для проверки: {}", subscriptionsByLink.size());
 
         for (Map.Entry<Link, List<Subscription>> entry : subscriptionsByLink.entrySet()) {
             Link link = entry.getKey();
@@ -72,7 +74,7 @@ public class UpdateCheckerService {
                         SubscriptionNotification notification = new SubscriptionNotification(link.getUrl(), newUpdate, chatIds);
                         notificationService.sendNotification(notification);
 
-                        log.info("Отправлены уведомления пользователям: {}", chatIds);
+                        log.info("Уведомления успешно отправлены для ссылки: {} пользователям: {}", link.getUrl(), chatIds);
                     } else {
                         log.info("Обновлений для ссылки {} не обнаружено.", link.getUrl());
                     }
