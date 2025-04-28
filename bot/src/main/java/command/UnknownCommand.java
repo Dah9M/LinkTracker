@@ -20,7 +20,7 @@ public class UnknownCommand implements Command {
 
 
     @Override
-    public void execute(Update update) throws TelegramApiException {
+    public void execute(Update update, String[] arguments) throws TelegramApiException {
         String chatId = update.getMessage().getChatId().toString();
         log.warn("Неизвестная команда от пользователя с chatId = {}", chatId);
 

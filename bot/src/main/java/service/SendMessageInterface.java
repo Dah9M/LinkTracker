@@ -7,4 +7,6 @@ import java.util.List;
 public interface SendMessageInterface {
     void sendMessage(String chatId, String message) throws TelegramApiException;
     void sendSubscriptions(String chatId, List<String> subscriptions);
+    void sendMenu(String chatId);
+    void sendSimpleMessage(String chatId, String text);
 }
