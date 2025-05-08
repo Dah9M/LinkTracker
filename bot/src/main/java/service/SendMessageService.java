@@ -53,11 +53,14 @@ public class SendMessageService implements SendMessageInterface {
             sm.setText("У вас нет активных подписок.");
         } else {
             log.info("Отправляем пользователю с chatId = {} {} подписок.", chatId, subscriptions.size());
-            StringBuilder messageBuilder = new StringBuilder("<b>Ваши подписки:</b>\n");
-            for (String subscription : subscriptions) {
-                messageBuilder.append("- ").append(subscription).append("\n");
+            StringBuilder mb = new StringBuilder("<b>Ваши подписки:</b>\n");
+            for (int i = 0; i < subscriptions.size(); i++) {
+                mb.append(i + 1)
+                        .append(". ")
+                        .append(subscriptions.get(i))
+                        .append("\n");
             }
-            sm.setText(messageBuilder.toString());
+            sm.setText(mb.toString());
         }
 
         try {
