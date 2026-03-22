@@ -18,7 +18,6 @@
 - **Scrapper-backend** — сервис, который регулярно проверяет ссылки и отправляет обнаруженные обновления боту  
 
 ---
-
 ```bash
 git clone https://github.com/Dah9M/LinkTracker.git
 cd LinkTracker
